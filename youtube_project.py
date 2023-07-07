@@ -1,37 +1,30 @@
 import pandas as pd
 import streamlit as st
-from streamlit_option_menu import option_menu
 import mysql.connector  
 import pymongo
 from googleapiclient.discovery import build
 
-# CREATING OPTION MENU
 with st.sidebar:
-    selected = option_menu("Select an option", ["abstract","absorb & Transfer","queries"], 
-                           icons=["house-door-fill","tools","card-text"],
-                           default_index=0,
-                           orientation="vertical",
-                           styles={"nav-link": {"font-size": "30px", "text-align": "centre", "margin": "2px", 
-                                                "--hover-color": "#C80101"},
-                                   "icon": {"font-size": "50px"},
-                                   "container" : {"max-width": "7000px"},
-                                   "nav-link-selected": {"background-color": "#C80101"}})
+    add_radio = st.radio(" youtube data harvesting and warehousing project",
+        ("Home","Extract & Transfer","queries")
+    )
+    st.snow()
 
 # Bridging a connection with MongoDB Atlas and Creating a new database(youtube_data)
-client = pymongo.MongoClient("your client id ")
-db = client.data_utube
+client = pymongo.MongoClient("mongodb://localhost:27017")
+db = client.real
 
 # CONNECTING WITH MYSQL DATABASE
-mydb = mysql.connector.connect(host="your host",
-                   user="your root",
-                   password="your password",
-                   database= "your database"
+mydb = mysql.connector.connect(host="127.0.0.1",
+                   user="root",
+                   password="Kalaijaya3",
+                   database= "reels"
                    )
 mycursor = mydb.cursor(buffered=True)
 
 
 # BUILDING CONNECTION WITH YOUTUBE API
-api_key = "your API key"
+api_key = "AIzaSyAGjuICj4owNicFNVMUdnLFRvwq-KjfV7o"
 youtube = build('youtube','v3',developerKey=api_key)
 
 
@@ -145,31 +138,33 @@ def channel_names():
 
 
 # HOME PAGE
-if selected == "abstract":
-    col1,col2 = st.columns(2,gap= 'small')
-    col1.markdown("## :blue[Domain] : Social Media")
-    col1.markdown("## :blue[Technologies used] : Python,MongoDB, Youtube Data API, MySql, Streamlit")
-    col1.markdown("## :blue[Overview] : Retrieving the Youtube channels data from the Google API, storing it in a MongoDB as data lake, migrating and transforming data into a SQL database,then querying the data and displaying it in the Streamlit app.")
-    col2.markdown("#   ")
-    col2.markdown("#   ")
-    col2.markdown("#   ")
-# EXTRACT AND TRANSFORM PAGE
-if selected == "absorb & Transfer":
-    tab1,tab2 = st.tabs(["$\huge    absorb $", "$\huge   transfer $"])
+if add_radio == "Home":
+    st.title(":blue[Project title]: youtube data harvesting and warehousing project")
+    st.title(":blue[Domain] : Social Media")
+    st.title(":blue[Technologies used] : Python,MongoDB, Youtube Data API, MySql, Streamlit")
+    st.title(":blue[Overview] : Retrieving the Youtube channels data from the Google API, storing it in a MongoDB as data lake, migrating and transforming data into a SQL database,then querying the data and displaying it in the Streamlit app")
+    #col2.markdown("#   ")
+    #col2.markdown("#   ")
+    #col2.markdown("#   ")
+# EXTRACT AND TRANSFORM PAGES
+if add_radio == "Extract & Transfer":
+    tab1,tab2 = st.tabs(["Extract","transfer"])
     
     # EXTRACT TAB
     with tab1:
-        st.markdown("#    ")
+        #st.markdown("#    ")
         st.write("### Enter YouTube Channel_ID  :")
         ch_id = st.text_input("Hint : Goto channel's home page > Right click > View page source > ctrl+F>?channel_id>copy channel_id").split(',')
 
         if ch_id and st.button("Extract Data"):
             ch_details = get_channel_details(ch_id)
-            st.write(f'#### Extracted data from :red["{ch_details[0]["Channel_name"]}"] channel')
+            st.write(f'#### Extracted data from :blue["{ch_details[0]["Channel_name"]}"] channel')
             st.table(ch_details)
+            st.success("extracted successful !!",icon="✅")
+            st.balloons()
 
         if st.button("Upload to MongoDB"):
-            with st.spinner('Please Wait for it...'):
+            with st.spinner('Please Wait a sec...'):
                 ch_details = get_channel_details(ch_id)
                 v_ids = get_channel_videos(ch_id)
                 vid_details = get_video_details(v_ids)
@@ -189,7 +184,8 @@ if selected == "absorb & Transfer":
 
                 collections3 = db.comments_details
                 collections3.insert_many(comm_details)
-                st.success("Upload to MogoDB successful !!")
+                st.success("Upload to MongoDB successful !!")
+                st.balloons()
       
     # TRANSFORM TAB
     with tab2:     
@@ -230,14 +226,15 @@ if selected == "absorb & Transfer":
                 insert_into_channels()
                 insert_into_videos()
                 insert_into_comments()
-                st.success("Transformation to MySQL Successful !!")
+                st.success("Transformation to MySQL Successful !!",icon="✅")
+                st.balloons()
             except:
-                st.error("Channel details already transformed !!")
+                st.error("Channel details already transformed !!",icon="🚨")
         
        
             
 # VIEW PAGE
-if selected == "queries":
+if add_radio == "queries":
     
     st.write("## :blue[Select any question ]")
     questions = st.selectbox('Questions',
