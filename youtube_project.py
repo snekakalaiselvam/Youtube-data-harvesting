@@ -17,14 +17,14 @@ db = client.real
 # CONNECTING WITH MYSQL DATABASE
 mydb = mysql.connector.connect(host="127.0.0.1",
                    user="root",
-                   password="Kalaijaya3",
-                   database= "reels"
+                   password=" ",
+                   database= " "
                    )
 mycursor = mydb.cursor(buffered=True)
 
 
 # BUILDING CONNECTION WITH YOUTUBE API
-api_key = "AIzaSyAGjuICj4owNicFNVMUdnLFRvwq-KjfV7o"
+api_key = " "
 youtube = build('youtube','v3',developerKey=api_key)
 
 
